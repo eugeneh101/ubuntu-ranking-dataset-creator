@@ -65,4 +65,5 @@ target/
 src/*.csv
 src/*.tgz
 dialogs/
+meta/
 .idea/

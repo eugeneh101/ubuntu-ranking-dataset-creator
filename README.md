@@ -1,3 +1,45 @@
+## README -- Eugene's modification to the Ubuntu Dialogue Corpus
+Here's how things work. I cloned the repo at https://github.com/rkadlec/ubuntu-ranking-dataset-creator that puts the ubuntu dataset into the correct form be run in the LSTM model at https://github.com/dennybritz/chatbot-retrieval.
+Basically, this folder is a copy of the first repo (https://github.com/rkadlec/ubuntu-ranking-dataset-creator ) with changes to the scripts such that they transform our .csv files into the correct format for the LSTM model. Everything in this folder is Python 2.  
+
+### New File: prepare_data.py:  
+This code mimics the creation of .tsv files of the prepare_data_maybe_download() function in create_ubuntu_dataset.py from https://github.com/rkadlec/ubuntu-ranking-dataset-creator  
+1) Instead of downloading the Ubuntu dataset, this python script will need your product line dataset .csv file as input (which has the following columns: time, repid, text, and thread_id). Also, specify an output file name which the script will save the conversations sorted by thread_ids with the earliest start_time. This output file doesn't do anything--it's solely for one's own viewing purposes.  
+2) Then, the script will create a folder called 'dialogs' and folders inside, which each contain up to 1000 tsv files. Each tsv file will be 1 entire conversation between agent and customer and contain the following columns: timestamp, thread_id, speaker, listener, text. Most of these folders inside 'dialogs' will in fact contain fewer than 1000 tsv files because the convert_chat_to_tsv() function in prepare_data.py will filter out conversations that have 3 or fewer interactions. For example, agent-customer-agent is 3 interactions; agent-customer-customer-customer-customer-customer-agent is still 3 interactions. The good thing is that these .tsv files contain the thread_id in the filename, so you can look back at conversation itself.  
+3) Lastly, this code will create a folder named 'meta' with the following files: trainfiles.csv, valfiles.csv, and testfiles.csv. These csv files are basically train-validation-test split at a 70%-15%-15% ratio, which is hard-coded. You can modify the ratio at your leisure.
+
+### Modified File:  create_ubuntu_dataset.py
+Deleted a lot of code that is no longer necessary like the prepare_data_maybe_download() function. Also, replaced word_tokenizer with TweetTokenizer as I believe TweetTokenizer performs better on short documents like ours and correctly tokenizes urls and punctuation.  
+This code will take the train.csv, valid.csv, and test.csv, which are the actual files that the LSTM needs to train itself.  
+If you take a look at these files, you'll see strings like "\__eou\__" and "\__eot\__", which stands for "end of utterance" and "end of turn". End of utterance is whenever a person presses ENTER. End of turn is whenever whoever is speaking changes. 
+
+
+### Modified File:  generate.sh  
+Change the --examples argument to an appropriate number.  
+You actually run this bash script in the command line, which calls on the create_ubuntu_dataset.py script.
+
+### Running script
+```
+source activate py27 # if this doesn't work, then run the following command to create 
+# Python 2.7 virtual environment and try again: conda create –n py27 python=2.7 anaconda
+
+cd src # as the code is inside this folder
+
+python input_file_name_that_contains_your_data.csv output_file_name_you_can_name_it_anything_you_want.csv 
+# for example: python prepare_data.py refrigerator_data.csv refrigerator_data_sorted.csv
+# which will create 'dialogs' and 'meta' folders.
+# This code will take around 5 minutes to run depending on size of the dataset
+
+./generate.sh -t -s -l # which calls on create_ubuntu_dataset.py to create 
+# This line will take longer--on the order of tens of minutes. I didn't write this code.  
+
+source deactivate # to exit out of Python 2 virtual environment to return to Python 3
+```
+
+
+
+
+
 #README -- Ubuntu Dialogue Corpus v2.0
 
 We describe the files for generating the Ubuntu Dialogue Corpus, and the dataset itself.

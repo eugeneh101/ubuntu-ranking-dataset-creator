@@ -242,32 +242,6 @@ def convert_csv_with_dialog_paths(csv_file):
     return map(convert_line_to_path, csv_file)
 
 
-def prepare_data_maybe_download(directory):
-  """
-  Download and unpack dialogs if necessary.
-  """
-  filename = 'ubuntu_dialogs.tgz'
-  url = 'http://cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz'
-  dialogs_path = os.path.join(directory, 'dialogs')
-
-  # test it there are some dialogs in the path
-  if not os.path.exists(os.path.join(directory,"10","1.tst")):
-    # dialogs are missing
-    archive_path = os.path.join(directory,filename)
-    if not os.path.exists(archive_path):
-        # archive missing, download it
-        print("Downloading %s to %s" % (url, archive_path))
-        filepath, _ = urllib.request.urlretrieve(url, archive_path)
-        print "Successfully downloaded " + filepath
-
-    # unpack data
-    if not os.path.exists(dialogs_path):
-          print("Unpacking dialogs ...")
-          with tarfile.open(archive_path) as tar:
-                tar.extractall(path=directory)
-          print("Archive unpacked.")
-
-    return
 
 #####################################################################################
 # Command line script related code
@@ -295,13 +269,15 @@ if __name__ == '__main__':
 
         stemmer = SnowballStemmer("english")
         lemmatizer = WordNetLemmatizer()
+        tokenizer = nltk.TweetTokenizer()
 
         for row in data_set:
             translated_row = [row[0], row[1]]
             translated_row.extend(row[2])
             
             if args.tokenize:
-                translated_row = map(nltk.word_tokenize, translated_row)
+                translated_row = map(tokenizer.tokenize, translated_row)
+                # I replaced word_tokenize with TweetTokenize because I believe that TweetTokenize performs better on short documents like the ones we have. TweetTokenize also correctly tokenizes urls and handles punctuation better.
                 if args.stem:
                     translated_row = map(lambda sub: map(stemmer.stem, sub), translated_row)
                 if args.lemmatize:
@@ -329,6 +305,7 @@ if __name__ == '__main__':
 
         stemmer = SnowballStemmer("english")
         lemmatizer = WordNetLemmatizer()
+        tokenizer = nltk.TweetTokenizer()
 
         # output the dataset
         w = unicodecsv.writer(open(args.output, 'w'), encoding='utf-8')
@@ -338,7 +315,8 @@ if __name__ == '__main__':
             translated_row = row
 
             if args.tokenize:
-                translated_row = [nltk.word_tokenize(row[i]) for i in [0,1]]
+                translated_row = [tokenizer.tokenize(row[i]) for i in [0,1]] 
+                # I replaced word_tokenize with TweetTokenize because I believe that TweetTokenize performs better on short documents like the ones we have. TweetTokenize also correctly tokenizes urls and handles punctuation better.
 
                 if args.stem:
                     translated_row = map(lambda sub: map(stemmer.stem, sub), translated_row)
@@ -399,9 +377,6 @@ if __name__ == '__main__':
     parser_valid.set_defaults(func=valid_cmd)
 
     args = parser.parse_args()
-
-    # download and unpack data if necessary
-    prepare_data_maybe_download(args.data_root)
 
     # create dataset
     args.func(args)
