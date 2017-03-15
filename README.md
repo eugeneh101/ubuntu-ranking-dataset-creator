@@ -35,10 +35,8 @@ python input_file_name_that_contains_your_data.csv output_file_name_you_can_name
 
 source deactivate # to exit out of Python 2 virtual environment to return to Python 3
 ```
-
-
-
-
+---
+<br><br><br>
 
 #README -- Ubuntu Dialogue Corpus v2.0
 
