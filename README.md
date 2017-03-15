@@ -1,11 +1,11 @@
 ## README -- Eugene's modification to the Ubuntu Dialogue Corpus
-Here's how things work. I cloned the repo at https://github.com/rkadlec/ubuntu-ranking-dataset-creator that puts the ubuntu dataset into the correct form be run in the LSTM model at https://github.com/dennybritz/chatbot-retrieval.
-Basically, this folder is a copy of the first repo (https://github.com/rkadlec/ubuntu-ranking-dataset-creator ) with changes to the scripts such that they transform our .csv files into the correct format for the LSTM model. Everything in this folder is Python 2.  
+Here's how things work. I cloned the repo at https://github.com/rkadlec/ubuntu-ranking-dataset-creator, which downloads the ubuntu dataset and puts it into the correct form to be run in the LSTM model at https://github.com/dennybritz/chatbot-retrieval.
+Basically, I made changes to the repo (https://github.com/rkadlec/ubuntu-ranking-dataset-creator ) so that we can transform our .csv files into the correct format for the LSTM model. Everything in this folder is Python 2.  
 
 ### New File: prepare_data.py:  
 This code mimics the creation of .tsv files of the prepare_data_maybe_download() function in create_ubuntu_dataset.py from https://github.com/rkadlec/ubuntu-ranking-dataset-creator  
 1) Instead of downloading the Ubuntu dataset, this python script will need your product line dataset .csv file as input (which has the following columns: time, repid, text, and thread_id). Also, specify an output file name which the script will save the conversations sorted by thread_ids with the earliest start_time. This output file doesn't do anything--it's solely for one's own viewing purposes.  
-2) Then, the script will create a folder called 'dialogs' and folders inside, which each contain up to 1000 tsv files. Each tsv file will be 1 entire conversation between agent and customer and contain the following columns: timestamp, thread_id, speaker, listener, text. Most of these folders inside 'dialogs' will in fact contain fewer than 1000 tsv files because the convert_chat_to_tsv() function in prepare_data.py will filter out conversations that have 3 or fewer interactions. For example, agent-customer-agent is 3 interactions; agent-customer-customer-customer-customer-customer-agent is still 3 interactions. The good thing is that these .tsv files contain the thread_id in the filename, so you can look back at conversation itself.  
+2) Then, the script will create a folder called 'dialogs' and folders inside, which each contain up to 1000 tsv files. Each tsv file will be 1 entire conversation between agent and customer and contain the following columns: timestamp, thread_id, speaker, listener, text. Most of these folders inside 'dialogs' will in fact contain fewer than 1000 .tsv files because the convert_chat_to_tsv() function in prepare_data.py will filter out conversations that have 3 or fewer interactions. For example, agent-customer-agent is 3 interactions; agent-customer-customer-customer-customer-customer-agent is still 3 interactions. The good thing is that these .tsv files contain the thread_id in the filename, so you can look back at conversation itself.  
 3) Lastly, this code will create a folder named 'meta' with the following files: trainfiles.csv, valfiles.csv, and testfiles.csv. These csv files are basically train-validation-test split at a 70%-15%-15% ratio, which is hard-coded. You can modify the ratio at your leisure.
 
 ### Modified File:  create_ubuntu_dataset.py
@@ -21,7 +21,7 @@ You actually run this bash script in the command line, which calls on the create
 ### Running script
 ```
 source activate py27 # if this doesn't work, then run the following command to create 
-# Python 2.7 virtual environment and try again: conda create –n py27 python=2.7 anaconda
+# Python 2.7 virtual environment and try again: conda create -n py27 python=2.7 anaconda
 
 cd src # as the code is inside this folder
 
