@@ -30,7 +30,8 @@ python input_file_name_that_contains_your_data.csv output_file_name_you_can_name
 # which will create 'dialogs' and 'meta' folders.
 # This code will take around 5 minutes to run depending on size of the dataset
 
-./generate.sh -t -s -l # which calls on create_ubuntu_dataset.py to create 
+./generate.sh -t -s -l # which calls on create_ubuntu_dataset.py to create train.csv, valid.csv, and test.csv
+# If you see errors, install wordnet by going into 'ipython' and type "import nltk; nltk.download('wordnet')" and exit out of ipython and try command again
 # This line will take longer--on the order of tens of minutes. I didn't write this code.  
 
 source deactivate # to exit out of Python 2 virtual environment to return to Python 3
